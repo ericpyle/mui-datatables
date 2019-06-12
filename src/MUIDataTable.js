@@ -15,6 +15,7 @@ import merge from 'lodash.merge';
 import isEqual from 'lodash.isequal';
 import find from 'lodash.find';
 import isUndefined from 'lodash.isundefined';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import textLabels from './textLabels';
 import { withStyles } from '@material-ui/core/styles';
 import { buildMap, getCollatorComparator, sortCompare } from './utils';
@@ -67,6 +68,10 @@ const hasToolbarItem = (options, title) => {
 
   return !isUndefined(find(TOOLBAR_ITEMS, i => options[i]));
 };
+
+const debouncedLog = (something) => console.log(something);
+
+const debounceSomething = AwesomeDebouncePromise(debouncedLog, 500);
 
 class MUIDataTable extends React.Component {
   static propTypes = {
@@ -195,8 +200,9 @@ class MUIDataTable extends React.Component {
     if (this.props.options.searchText) this.setState({ page: 0 });
   }
 
-  componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps) {
     if (this.props.data !== prevProps.data || this.props.columns !== prevProps.columns) {
+      await debounceSomething('debounced data or columns');
       this.setTableData(this.props, TABLE_LOAD.INITIAL, () => {
         this.setTableAction('propsUpdate');
       });
